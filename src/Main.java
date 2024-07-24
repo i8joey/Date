@@ -22,7 +22,7 @@ public class Main {
     public static int getTotalDays(String firstDay, String secondDay, Date firstDate, Date secondDate) {
         int daysCount = (Math.abs(firstDate.year + 1 - secondDate.year)) * 365;
         for (int i = firstDate.year; i <= secondDate.year; i++) {
-            //fix
+            //fix - count is a little too high
             if (isLeapYear(i, 2)) {
                 daysCount++;
             }
