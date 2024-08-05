@@ -13,34 +13,59 @@ public class Main {
         System.out.println("Please provide the first date in MM/DD/YYYY format");
         Date firstDate = getInputAndCheck();
         Date secondDate = getInputAndCheck();
-        String firstDay = daysOfWeek[dayOfWeek(firstDate) - 1];
-        String secondDay = daysOfWeek[dayOfWeek(secondDate) - 1];
+        String firstDay = daysOfWeek[dayOfWeek(firstDate)];
+        String secondDay = daysOfWeek[dayOfWeek(secondDate)];
         int calculateDays = getTotalDays(firstDay, secondDay, firstDate, secondDate);
         System.out.println(calculateDays);
+        System.out.println(getFridays(calculateDays, firstDay, secondDay));
+    }
+
+    public static int getFridays(int days, String firstDay, String secondDay) {
+        int first = Arrays.asList(daysOfWeek).indexOf(firstDay);
+        int second = Arrays.asList(daysOfWeek).indexOf(secondDay);
+        int weeks = days / 7;
+        int friday = 7 * weeks + Math.abs(first - 5 - 1);
+        if (friday > days) {
+            friday --;
+        }
+        return friday / 7;
     }
 
     public static int getTotalDays(String firstDay, String secondDay, Date firstDate, Date secondDate) {
-        int daysCount = (Math.abs(firstDate.year + 1 - secondDate.year)) * 365;
-        for (int i = firstDate.year; i <= secondDate.year; i++) {
-            //fix - count is a little too high
+        int daysCount = secondDate.day + Math.abs(firstDate.day - daysInMonth.get(firstDate.month - 1));
+        for (int i = firstDate.year; i <= secondDate.year; i ++) {
+            int startMonth = 1;
+            int endMonth = 12;
+            if (i == firstDate.year && firstDate.month != 12) {
+                startMonth = firstDate.month + 1;
+            }
+            else if (firstDate.month == 12 && i == firstDate.year){
+                continue;
+            }
+            if (i == secondDate.year) {
+                endMonth = secondDate.month - 1;
+            }
+            for (int j = startMonth; j <= endMonth; j++) {
+                daysCount += daysInMonth.get(j - 1);
+            }
+        }
+        if (isLeapYear(firstDate.year, firstDate.month)) {
+            daysCount ++;
+        }
+        if (isLeapYear(secondDate.year, secondDate.month)) {
+            daysCount++;
+        }
+        for (int i = firstDate.year + 1; i <= secondDate.year - 1; i++) {
             if (isLeapYear(i, 2)) {
                 daysCount++;
             }
-        }
-        daysCount += daysInMonth.get(firstDate.month - 1) - firstDate.day ;
-        daysCount += secondDate.day;
-        for (int i = firstDate.month + 1; i <= 12; i++) {
-            daysCount += daysInMonth.get((i - 1)% 12);
-        }
-        for (int i = 1; i <= secondDate.month - 1; i++) {
-            daysCount += daysInMonth.get((i - 1)% 12);
         }
         return daysCount;
     }
 
     public static boolean isLeapYear(int year, int month) {
         if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
-            if (month == 1 || month == 2) {
+            if (month < 3) {
                 return true;
             }
         }
@@ -85,9 +110,9 @@ public class Main {
 
 
     public static boolean checkDays(String input) {
-        int month = Integer.parseInt(input.substring(0, 1));
-        int day = Integer.parseInt(input.substring(3, 4));
-        if (day > daysInMonth.get(month)) {
+        int month = Integer.parseInt(input.substring(0, 2));
+        int day = Integer.parseInt(input.substring(3, 5));
+        if (day > daysInMonth.get(month - 1)) {
             return false;
         }
         return true;
